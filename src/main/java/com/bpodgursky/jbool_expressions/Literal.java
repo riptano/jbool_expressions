@@ -1,8 +1,8 @@
 package com.bpodgursky.jbool_expressions;
 
-import com.bpodgursky.jbool_expressions.rules.Rule;
-
 import java.util.List;
+
+import com.bpodgursky.jbool_expressions.rules.Rule;
 
 public class Literal<K> extends Expression<K>{
   public static final String EXPR_TYPE = "literal";
@@ -32,6 +32,7 @@ public class Literal<K> extends Expression<K>{
 
   private Literal(boolean value){
     this.value = value;
+    this.hash = Boolean.hashCode(value);
   }
 
   public String toString(){
@@ -48,12 +49,16 @@ public class Literal<K> extends Expression<K>{
   }
 
   @Override
-  public boolean equals(Expression expr) {
-    return expr instanceof Literal && ((Literal)expr).getValue() == getValue();
+  public String getExprType() {
+    return EXPR_TYPE;
   }
 
   @Override
-  public String getExprType() {
-    return EXPR_TYPE;
+  public boolean equals(Object maybeLiteral)
+  {
+    if( ! (maybeLiteral instanceof Literal) )
+      return false;
+
+    return this.hash == ((Literal) maybeLiteral).hash;
   }
 }

@@ -1,8 +1,8 @@
 package com.bpodgursky.jbool_expressions;
 
-import com.bpodgursky.jbool_expressions.rules.Rule;
-
 import java.util.List;
+
+import com.bpodgursky.jbool_expressions.rules.Rule;
 
 public class Variable<K> extends Expression<K> {
   public static final String EXPR_TYPE = "variable";
@@ -11,6 +11,7 @@ public class Variable<K> extends Expression<K> {
 
   private Variable(K value){
     this.value = value;
+    this.hash = value.hashCode();
   }
 
   public K getValue(){
@@ -26,11 +27,6 @@ public class Variable<K> extends Expression<K> {
     return this;
   }
 
-  @Override
-  public boolean equals(Expression expr) {
-    return expr instanceof Variable && ((Variable)expr).getValue().equals(getValue());
-  }
-
   public static <K> Variable<K> of(K value){
     return new Variable<K>(value);
   }
@@ -38,5 +34,14 @@ public class Variable<K> extends Expression<K> {
   @Override
   public String getExprType() {
     return EXPR_TYPE;
+  }
+
+  @Override
+  public boolean equals(Object maybeVariable)
+  {
+    if( ! (maybeVariable instanceof Variable) )
+      return false;
+
+    return this.hash == ((Variable) maybeVariable).hash;
   }
 }

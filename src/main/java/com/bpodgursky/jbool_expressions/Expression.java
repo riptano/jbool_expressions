@@ -6,23 +6,24 @@ import com.bpodgursky.jbool_expressions.rules.Rule;
 
 public abstract class Expression<K> implements Comparable<Expression> {
 
+  public long hash;
+
   public int compareTo(Expression o) {
-    return toString().compareTo(o.toString());
+    return Long.compare(this.hash, o.hash);
   }
 
   @Override
   public boolean equals(Object o){
-    return o instanceof Expression && equals((Expression) o);
+    return o instanceof Expression &&
+           this.hash == ((Expression) o).hash;
   }
 
   @Override
-  public int hashCode(){
-    return toString().hashCode();
+  public int hashCode() {
+    return (int) this.hash;
   }
 
   public abstract Expression<K> apply(List<Rule<?, K>> rules);
-
-  public abstract boolean equals(Expression expr);
 
   public abstract String getExprType();
 }
