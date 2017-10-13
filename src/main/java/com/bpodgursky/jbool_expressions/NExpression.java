@@ -3,21 +3,30 @@ package com.bpodgursky.jbool_expressions;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import com.bpodgursky.jbool_expressions.rules.Rule;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
-import com.google.common.collect.Lists;
 
 public abstract class NExpression<K> extends Expression<K>{
 
   public final Expression<K>[] expressions;
 
-  protected NExpression(List<? extends Expression<K>> expressions){
+  protected NExpression(List<? extends Expression<K>> expressions, Object hashBase){
     if(expressions.isEmpty()){
       throw new IllegalArgumentException("Arguments length 0!");
     }
 
     this.expressions = expressions.toArray(ExprUtil.<K>expr(0));
+
     Arrays.sort(this.expressions);
+
+    this.hash = hashBase.hashCode();
+    for(Expression e: this.expressions)
+    {
+      this.hash = this.hash * 31;
+      this.hash = this.hash + e.hash;
+    }
   }
 
   @Override

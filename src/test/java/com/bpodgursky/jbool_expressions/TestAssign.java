@@ -1,9 +1,9 @@
 package com.bpodgursky.jbool_expressions;
 
+import java.util.Collections;
+
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
 import junit.framework.TestCase;
-
-import java.util.Collections;
 
 public class TestAssign extends TestCase {
 
@@ -16,7 +16,7 @@ public class TestAssign extends TestCase {
     );
 
     Expression<String> expr = RuleSet.assign(expr3, Collections.singletonMap("A", false));
-    assertEquals("((C | D) & B)", expr.toString());
+    assertEquals("(B & (C | D))", expr.toString());
 
     expr = RuleSet.assign(expr, Collections.singletonMap("B", true));
     assertEquals("(C | D)", expr.toString());

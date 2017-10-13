@@ -5,10 +5,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Maps;
+
 import com.bpodgursky.jbool_expressions.eval.EvalEngine;
 import com.bpodgursky.jbool_expressions.parsers.ExprParser;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
-import com.google.common.collect.Maps;
 
 public class TestExpressions extends JBoolTestCase {
 
@@ -20,7 +21,7 @@ public class TestExpressions extends JBoolTestCase {
         Variable.of("F")
     );
 
-    assertEquals("(!(A | true) & (C | D | false) & F)", expr.toString());
+    assertEquals("(F & !(A | true) & (C | D | false))", expr.toString());
 
     Set<String> allVars = new HashSet<String>(Arrays.asList("A", "C", "D", "F"));
     assertEquals(allVars, ExprUtil.getVariables(expr));

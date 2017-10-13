@@ -1,0 +1,93 @@
+buildscript {
+    repositories { jcenter() }
+}
+
+plugins {
+    id 'java'
+    id 'antlr'
+    id 'idea'
+    id 'nebula.maven-publish' version '4.4.4'
+    id 'nebula.maven-scm' version '4.4.4'
+    id 'nebula.source-jar' version '4.4.4'
+    id 'nebula.info-scm' version '3.0.3'
+}
+
+
+group = 'com.bpodgursky'
+version = '1.11-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+sourceSets {
+    main {
+        antlr {
+            srcDirs = [ 'src/main/antlr3' ]
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+    options.compilerArgs.add '-parameters'
+}
+
+repositories {
+    mavenLocal()
+
+    // our DataStax Maven repo requires user authentication for allowing access to all artifacts
+    // in order to fail fast, we do not configure the repo, if the credentials are not provided
+    // additional/global repostories could be configured as well via
+    // https://docs.gradle.org/current/userguide/init_scripts.html
+    if (rootProject.hasProperty('datastaxRepositoryUsername') && rootProject.hasProperty('datastaxRepositoryPassword')) {
+        maven {
+            url = 'http://datastax.artifactoryonline.com/datastax/dse'
+            credentials {
+                username rootProject.datastaxRepositoryUsername
+                password rootProject.datastaxRepositoryPassword
+            }
+        }
+    }
+
+}
+
+dependencies {
+    compile group: 'commons-lang', name: 'commons-lang', version:'2.5'
+    compile group: 'com.google.guava', name: 'guava', version:'14.0-rc3'
+    antlr group: 'org.antlr', name: 'antlr', version:'3.5.2'
+    testCompile group: 'junit', name: 'junit', version:'4.12'
+}
+
+idea {
+    project {
+        vcs = 'Git'
+    }
+}
+
+publishing {
+    publications {
+        nebula(MavenPublication) {
+            pom.withXml { xml ->
+                def licensesNode = xml.asNode()?.licenses
+                if (!licensesNode) {
+                    licensesNode = xml.asNode().appendNode('licenses')
+                }
+                def apache = licensesNode.appendNode('license')
+                apache.appendNode('name', 'DataStax Proprietary License')
+                apache.appendNode('url', 'http://www.datastax.com/enterprise-terms')
+            }
+        }
+    }
+
+    if (project.hasProperty('datastaxPublishingSnapshotRepositoryUrl')) {
+        repositories {
+            maven {
+                url version.endsWith('-SNAPSHOT') ? datastaxPublishingSnapshotRepositoryUrl : datastaxPublishingRepositoryUrl
+                credentials {
+                    username datastaxRepositoryUsername
+                    password datastaxRepositoryPassword
+                }
+            }
+        }
+    }
+}

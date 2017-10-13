@@ -26,19 +26,19 @@ public class TestAnd extends JBoolTestCase {
   }
 
   public void testToPos() {
-    assertToPos("((A | C) & B & D)", "(A & B & D) | (B & C & D)");
-    assertToPos("(!C | !D | A)", "((A & !B) | (A & D) | (!C & D) | !D)");
+    assertToPos("(B & D & (A | C))", "(A & B & D) | (B & C & D)");
+    assertToPos("(A | !C | !D)", "((A & !B) | (A & D) | (!C & D) | !D)");
     assertEvaluateSame(
         ExprParser.parse("((A & !B) | (A & D) | (!C & D) | !D)"),
         ExprParser.parse("(!C | !D | A)")
     );
 
-    assertToPos("((A | C) & B & D)", "(A & B & D) | (B & C & D)");
+    assertToPos("(B & D & (A | C))", "(A & B & D) | (B & C & D)");
   }
 
 
   public void testToSopPerformance() throws Exception {
-    assertToPos("((A | B) & (C | D | E | F) & (K | L | M) & N)", "((A | B) & (C | D | E | F) & (K | L | M) & N)");
+    assertToPos("(N & (A | B) & (K | L | M) & (C | D | E | F))", "((A | B) & (C | D | E | F) & (K | L | M) & N)");
   }
 
   public void testSimplifyChildren() {

@@ -2,9 +2,8 @@ package com.bpodgursky.jbool_expressions;
 
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.google.common.base.Optional;
+import org.apache.commons.lang.StringUtils;
 
 public class And<K> extends NExpression<K> {
   public static final String EXPR_TYPE = "and";
@@ -12,7 +11,7 @@ public class And<K> extends NExpression<K> {
 
 
   private And(List<? extends Expression<K>> children) {
-    super(children);
+    super(children, "AND".hashCode());
   }
 
   @Override
@@ -44,26 +43,21 @@ public class And<K> extends NExpression<K> {
   }
 
   @Override
-  public boolean equals(Expression expr) {
-    if (!(expr instanceof And)) {
-      return false;
-    }
-    And other = (And)expr;
-
-    if (other.expressions.length != expressions.length) {
-      return false;
-    }
-
-    for (int i = 0; i < expressions.length; i++) {
-      if (!expressions[i].equals(other.expressions[i])) {
-        return false;
-      }
-    }
-    return true;
+  public String getExprType() {
+    return EXPR_TYPE;
   }
 
   @Override
-  public String getExprType() {
-    return EXPR_TYPE;
+  public boolean equals(Object maybeExpression)
+  {
+    if( ! (maybeExpression instanceof And) )
+      return false;
+
+    And otherAnd = (And) maybeExpression;
+
+    if( otherAnd.getChildren().size() != expressions.length )
+      return false;
+
+    return this.hash == otherAnd.hash;
   }
 }
