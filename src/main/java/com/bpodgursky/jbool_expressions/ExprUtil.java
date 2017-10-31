@@ -3,7 +3,7 @@ package com.bpodgursky.jbool_expressions;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -29,26 +29,44 @@ public class ExprUtil {
     return Or.of(newChildren);
   }
 
-  public static <K> Expression<K> collapseToPOS(Or<K> or, And<K> internalAnd, Expression<K> omitFromAnd){
-    Expression<K>[] childrenNew = ExprUtil.allExceptMatch(or.expressions, internalAnd);
-    List<Expression<K>> newChildren = Lists.newArrayList();
+  public static <K> Expression<K> stripNegation(And<K> and, Or<K> internalOr, Expression<K> omitFromOr){
+    Expression<K>[] childrenNew = ExprUtil.allExceptMatch(and.expressions, internalOr);
+    List<Expression<K>> newChildren = Lists.newArrayList(childrenNew);
 
-    for (Expression<K> andChild : internalAnd.expressions) {
-      if(!andChild.equals(omitFromAnd)) {
-        List<Expression<K>> orOthers = Lists.newArrayList();
-        ExprUtil.addAll(orOthers, childrenNew);
-        orOthers.add(andChild);
+    List<Expression<K>> orOthers = Lists.newArrayList();
+    for (Expression<K> orChild : internalOr.expressions) {
 
-        newChildren.add(Or.of(orOthers));
+      if(!orChild.equals(omitFromOr)) {
+        orOthers.add(orChild);
       }
 
     }
 
+    newChildren.add(Or.of(orOthers));
+
     return And.of(newChildren);
   }
 
+  public static <K> Expression<K> stripNegation(Or<K> or, And<K> internalAnd, Expression<K> omitFromAnd){
+    Expression<K>[] childrenNew = ExprUtil.allExceptMatch(or.expressions, internalAnd);
+    List<Expression<K>> newChildren = Lists.newArrayList(childrenNew);
+
+    List<Expression<K>> andOthers = Lists.newArrayList();
+    for (Expression<K> andChild : internalAnd.expressions) {
+
+      if(!andChild.equals(omitFromAnd)) {
+        andOthers.add(andChild);
+      }
+
+    }
+
+    newChildren.add(And.of(andOthers));
+
+    return Or.of(newChildren);
+  }
+
   public static <K> Expression<K>[] allExceptMatch(Collection<Expression<K>> exprs, Set<? extends Expression<K>> omit){
-    Set<Expression<K>> andTerms = new HashSet<Expression<K>>();
+    Set<Expression<K>> andTerms = new LinkedHashSet<Expression<K>>();
     for(Expression<K> eachExpr: exprs){
       if(!omit.contains(eachExpr)){
         andTerms.add(eachExpr);
@@ -60,11 +78,11 @@ public class ExprUtil {
 
   public static <K> Expression<K>[] allExceptMatch(List<Expression<K>> exprs, Expression<K> omit) {
     //noinspection unchecked
-    return allExceptMatch(exprs.toArray(new Expression[0]), omit);
+    return allExceptMatch(exprs.toArray(new Expression[exprs.size()]), omit);
   }
 
     public static <K> Expression<K>[] allExceptMatch(Expression<K>[] exprs, Expression<K> omit){
-    Set<Expression<K>> andTerms = new HashSet<Expression<K>>();
+    Set<Expression<K>> andTerms = new LinkedHashSet<Expression<K>>();
     for(Expression<K> eachExpr: exprs){
       if(!eachExpr.equals(omit)){
         andTerms.add(eachExpr);
@@ -103,7 +121,7 @@ public class ExprUtil {
     }else if(expr instanceof Not){
       return getVariables(((Not<K>) expr).getE());
     }else if(expr instanceof NExpression){
-      Set<K> vars = new HashSet<K>();
+      Set<K> vars = new LinkedHashSet<K>();
       for(Expression<K> child: ((NExpression<K>)expr).expressions){
         vars.addAll(getVariables(child));
       }
