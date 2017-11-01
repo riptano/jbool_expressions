@@ -14,7 +14,7 @@ plugins {
 
 
 group = 'com.bpodgursky'
-version = '1.11-DS'
+version = '1.12-DS'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

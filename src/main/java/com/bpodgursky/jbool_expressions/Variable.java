@@ -1,8 +1,9 @@
 package com.bpodgursky.jbool_expressions;
 
-import java.util.List;
-
 import com.bpodgursky.jbool_expressions.rules.Rule;
+
+import java.util.List;
+import java.util.Objects;
 
 public class Variable<K> extends Expression<K> {
   public static final String EXPR_TYPE = "variable";
@@ -11,7 +12,6 @@ public class Variable<K> extends Expression<K> {
 
   private Variable(K value){
     this.value = value;
-    this.hash = value.hashCode();
   }
 
   public K getValue(){
@@ -37,11 +37,15 @@ public class Variable<K> extends Expression<K> {
   }
 
   @Override
-  public boolean equals(Object maybeVariable)
-  {
-    if( ! (maybeVariable instanceof Variable) )
-      return false;
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Variable<?> variable = (Variable<?>) o;
+    return Objects.equals(value, variable.value);
+  }
 
-    return this.hash == ((Variable) maybeVariable).hash;
+  @Override
+  public int hashCode() {
+    return Objects.hash(value);
   }
 }

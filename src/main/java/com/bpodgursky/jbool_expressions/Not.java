@@ -1,11 +1,11 @@
 package com.bpodgursky.jbool_expressions;
 
 import java.util.List;
-
-import com.google.common.base.Optional;
+import java.util.Objects;
 
 import com.bpodgursky.jbool_expressions.rules.Rule;
 import com.bpodgursky.jbool_expressions.rules.RuleSet;
+import com.google.common.base.Optional;
 
 public class Not<K> extends Expression<K> {
   public static final String EXPR_TYPE = "not";
@@ -15,7 +15,6 @@ public class Not<K> extends Expression<K> {
 
   private Not(Expression<K> e) {
     this.e = e;
-    this.hash = e.hash * 13;
   }
 
   public Expression<K> getE() {
@@ -43,12 +42,17 @@ public class Not<K> extends Expression<K> {
     return EXPR_TYPE;
   }
 
-  @Override
-  public boolean equals(Object maybeNot)
-  {
-    if( ! (maybeNot instanceof Not) )
-      return false;
 
-    return this.hash == ((Not) maybeNot).hash;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Not<?> not = (Not<?>) o;
+    return Objects.equals(e, not.e);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(e);
   }
 }
